@@ -1,1 +1,1 @@
-# 25-C-Codes-from-Gazani
+# 25-Cpp-Codes-from-Gazani
