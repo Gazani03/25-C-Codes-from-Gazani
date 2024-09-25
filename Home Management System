@@ -1,0 +1,169 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class User {
+protected:
+    string username, password;
+public:
+    User(string u, string p) : username(u), password(p) {}
+    virtual string getRole() = 0;
+    bool authenticate(string u, string p) { return username == u && password == p; }
+};
+
+// Admin class
+class Admin : public User {
+public:
+    Admin(string u, string p) : User(u, p) {}
+    string getRole() override { return "Admin"; }
+};
+
+
+class Member : public User {
+public:
+    Member(string u, string p) : User(u, p) {}
+    string getRole() override { return "Member"; }
+};
+
+vector<User*> users; // Store users
+
+
+void registerUser() {
+    string username, password, role;
+    cout << "Enter username: "; cin >> username;
+    cout << "Enter password: "; cin >> password;
+    cout << "Enter role (Admin/Member): "; cin >> role;
+
+    if (role == "Admin") users.push_back(new Admin(username, password));
+    else if (role == "Member") users.push_back(new Member(username, password));
+    else cout << "Invalid role!\n";
+}
+
+
+User* loginUser() {
+    string username, password;
+    cout << "Enter username: "; cin >> username;
+    cout << "Enter password: "; cin >> password;
+
+    for (auto user : users) {
+        if (user->authenticate(username, password)) {
+            cout << "Logged in as: " << user->getRole() << endl;
+            return user;
+        }
+    }
+    cout << "Invalid credentials!\n";
+    return nullptr;
+}
+
+
+class HomeItem {
+protected:
+    string name;
+public:
+    HomeItem(string n) : name(n) {}
+    virtual void display() = 0;
+};
+
+// InventoryItem class
+class InventoryItem : public HomeItem {
+    int quantity;
+public:
+    InventoryItem(string n, int q) : HomeItem(n), quantity(q) {}
+    void display() override { cout << "Inventory: " << name << ", Quantity: " << quantity << endl; }
+};
+
+// Task class
+class Task : public HomeItem {
+    string assignedTo;
+public:
+    Task(string n, string a) : HomeItem(n), assignedTo(a) {}
+    void display() override { cout << "Task: " << name << ", Assigned to: " << assignedTo << endl; }
+};
+
+
+class Expense : public HomeItem {
+    double amount;
+public:
+    Expense(string n, double a) : HomeItem(n), amount(a) {}
+    void display() override { cout << "Expense: " << name << ", Amount: $" << amount << endl; }
+    double getAmount() { return amount; }
+};
+
+vector<InventoryItem> inventory;
+vector<Task> tasks;
+vector<Expense> expenses;
+
+
+void addInventoryItem() {
+    string name; int quantity;
+    cout << "Enter item name: "; cin >> name;
+    cout << "Enter quantity: "; cin >> quantity;
+    inventory.push_back(InventoryItem(name, quantity));
+}
+
+void addTask() {
+    string taskName, assignedTo;
+    cout << "Enter task name: "; cin >> taskName;
+    cout << "Assigned to: "; cin >> assignedTo;
+    tasks.push_back(Task(taskName, assignedTo));
+}
+
+
+void addExpense() {
+    string category; double amount;
+    cout << "Enter expense category: "; cin >> category;
+    cout << "Enter amount: "; cin >> amount;
+    expenses.push_back(Expense(category, amount));
+}
+
+
+void displayItems() {
+    cout << "\nInventory Items:\n";
+    for (auto& item : inventory) item.display();
+
+    cout << "Tasks:\n";
+    for (auto& task : tasks) task.display();
+
+    cout << "Expenses:\n";
+    for (auto& expense : expenses) expense.display();
+}
+
+
+void trackBudget(double budget) {
+    double totalExpense = 0;
+    for (auto& expense : expenses) totalExpense += expense.getAmount();
+    cout << "Total Expenses: $" << totalExpense << "\nRemaining Budget: $" << budget - totalExpense << endl;
+}
+
+int main() {
+    int choice;
+    User* loggedInUser = nullptr;
+    double budget = 0.0;
+
+    while (true) {
+        cout << "\n1. Register 2. Login 3. Add Inventory 4. Add Task 5. Add Expense 6. Display Items 7. Track Budget 8. Exit\nEnter choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            registerUser();
+        } else if (choice == 2) {
+            loggedInUser = loginUser();
+            if (loggedInUser != nullptr && budget == 0) {
+                cout << "Enter your budget: "; cin >> budget;
+            }
+        } else if (choice >= 3 && choice <= 6 && loggedInUser) {
+            if (choice == 3) addInventoryItem();
+            else if (choice == 4) addTask();
+            else if (choice == 5) addExpense();
+            else if (choice == 6) displayItems();
+        } else if (choice == 7 && loggedInUser) {
+            trackBudget(budget);
+        } else if (choice == 8) {
+            break; // Exit the loop
+        } else {
+            cout << "Invalid choice or log in first!\n";
+        }
+    }
+    return 0;
+}
