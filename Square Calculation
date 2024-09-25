@@ -1,0 +1,35 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+string ltrim(const string &);
+string rtrim(const string &);
+
+int main()
+{
+    cout << "Please enter an integer to find its square: ";
+    string n_temp;
+    getline(cin, n_temp);
+
+    int n = stoi(ltrim(rtrim(n_temp)));
+
+    int square = n * n;
+
+    cout << n << " = " << square << endl;
+
+    return 0;
+}
+
+string ltrim(const string &str) {
+    string s(str);
+    s.erase(s.begin(), find_if(s.begin(), s.end(), [](unsigned char c) { return !isspace(c); }));
+    return s;
+}
+
+string rtrim(const string &str) {
+    string s(str);
+    s.erase(find_if(s.rbegin(), s.rend(), [](unsigned char c) { return !isspace(c); }).base(), s.end());
+    return s;
+}
