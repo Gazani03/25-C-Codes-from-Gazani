@@ -1,0 +1,30 @@
+#include <iostream>
+#include <unordered_map>
+using namespace std;
+
+int main() {
+    int n, q;
+    cout << "Enter values of n and q:\n";
+    cin >> n >> q;
+
+    unordered_map<int, int> myMap;
+    for(int i = 0; i < q; i++) {
+        string command;
+        cin >> command;
+
+        if(command == "set") {
+            int key, value;
+            cin >> key >> value;
+            myMap[key] = value;
+        } else if(command == "get") {
+            int key;
+            cin >> key;
+            if(myMap.find(key) != myMap.end()) {
+                cout << myMap[key] << endl;
+            } else {
+                cout << -1 << endl;
+            }
+        }
+    }
+    return 0;
+}
